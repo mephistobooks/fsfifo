@@ -17,9 +17,9 @@ Jeweler::Tasks.new do |gem|
   gem.name = "fsfifo"
   gem.homepage = "http://github.com/mephistobooks/fsfifo"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "martin.route66.blues+atlassian@gmail.com"
+  gem.summary = %Q{Fixed size FIFO.}
+  gem.description = %Q{Fixed size FIFO, LIFO, and Array.}
+  gem.email = "martin.route66.blues+github@gmail.com"
   gem.authors = ["YAMAMOTO, Masayuki"]
   # dependencies defined in Gemfile
 end
@@ -28,17 +28,21 @@ Jeweler::RubygemsDotOrgTasks.new
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  #test.pattern = 'test/**/test_*.rb'
+  test.pattern = 'test/**/test*.rb'
   test.verbose = true
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
-end
+#require 'rcov/rcovtask'
+#Rcov::RcovTask.new do |test|
+#  test.libs << 'test'
+#  test.pattern = 'test/**/test_*.rb'
+#  test.verbose = true
+#  test.rcov_opts << '--exclude "gems/*"'
+#end
+#require 'simplecov'
+#require 'simplecov-rcov'
+#SimpleCov.start if ENV["COVERAGE"]  # to do this, type COVERAGE=true rake test
 
 task :default => :test
 

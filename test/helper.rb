@@ -1,3 +1,7 @@
+require 'simplecov'
+require 'simplecov-rcov'
+SimpleCov.start if ENV["COVERAGE"]  # to do this, type COVERAGE=true rake test
+
 require 'rubygems'
 require 'bundler'
 begin
