@@ -1,19 +1,22 @@
-# fs_fifo ReadMe
+# fsfifo ReadMe
 
 ## Fixed Size FIFO, LIFO, Array lib.
 
-fs_fifo.rb defines FSFIFO, which is the fixed size FIFO (Queue).
+fsfifo.rb defines FSFIFO, which is the fixed size FIFO (Queue).
 
-This extends the built-in Array so you can easily understand it.
+This extends the built-in Array so you can easily understand it. (fsfifo.rb also defines FSLIFO and FSArray, and FSArray is the most general class)
 
-(fs_fifo.rb also defines FSArray and FSLIFO. FSArray is the most general class)
 
-## Useage
+## Usage
 
-You can create a FIFO whose size is 4 by:
+Do ```[sudo] gem install fsfifo``` and ```require 'fsfifo'``` for preparation.
+
+### new
+
+Just ```FSFIFO.new(4)``` or ```FSFIFO.new( size: 4 )``` and then you can create a FIFO whose size is 4:
 
 ```
->>fsf = FSFIFO.new( size: 4 )
+>>fsf = FSFIFO.new( 4 )
 => []
 >> fsf.size
 => 0
@@ -21,7 +24,10 @@ You can create a FIFO whose size is 4 by:
 => 4
 ```
 
-Here, FSFIFO#size means the number of elements and FSFIFO#fifosize means the size of FIFO.
+### size
+Here, FSFIFO#size means the number of elements and FSFIFO#fifosize means the size of FIFO. You can also change the size of FIFO by FSFIFO#resize.
+
+### operation
 
 And you can push objects like this:
 
