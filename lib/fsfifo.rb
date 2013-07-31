@@ -26,10 +26,14 @@ class FSArray < Array
       :of_proc => Proc.new{},
       :uf_enbl => false,
       :uf_proc => Proc.new{},
+      :push_enbl => false, #TODO.
+      :push_proc => Proc.new{},
       :wm_size => 1,
       :wm_enbl => false,
       :wm_proc => Proc.new{},
     }.merge( args )
+
+    @shifted = nil  #TODO.
 
     #
     super( )
