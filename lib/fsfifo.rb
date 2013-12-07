@@ -10,28 +10,36 @@
 #
 class FSArray < Array
 
+  FSARRAY_SIZE_DEFAULT = 1
   #
   # FSArray#new( n )
-  # FSArray#new( size: n, of_enbl: true, of_proc: Proc.new{...} )
+  # FSArray#new( size: n, of_enable: true, of_proc: Proc.new{...} )
   #
-  def initialize( args = {} )
+  def initialize( _size = FSARRAY_SIZE_DEFAULT,
+                  size: FSARRAY_SIZE_DEFAULT,
+                  of_enable: false, of_proc: Proc.new{ raise "Overflow!" },
+                  uf_enable: false, uf_proc: Proc.new{ raise "Underflow!" },
+                  push_enable: false, push_proc: Proc.new{},
+                  wm_size: 1,
+                  wm_enable: false, wm_proc: Proc.new{ raise "Reached WM!" }
+                )
 
-    if args.class == Fixnum
-      args = { size: args, wm_size: args }
-    end
+    raise "Watermark #{wm_size} is out of range[0,#{size}]" if
+      wm_size < 0 or wm_size > size
 
+    size = _size if _size != FSARRAY_SIZE_DEFAULT
     @opt = {
-      :size => 1,
-      :of_enbl => false,
-      :of_proc => Proc.new{},
-      :uf_enbl => false,
-      :uf_proc => Proc.new{},
-      :push_enbl => false, #TODO.
-      :push_proc => Proc.new{},
-      :wm_size => 1,
-      :wm_enbl => false,
-      :wm_proc => Proc.new{},
-    }.merge( args )
+      :size    => size,
+      :of_enable => of_enable,
+      :of_proc => of_proc,
+      :uf_enable => uf_enable,
+      :uf_proc => uf_proc,
+      :push_enable => push_enable, #TODO.
+      :push_proc => push_proc,
+      :wm_size => wm_size,
+      :wm_enable => wm_enable,
+      :wm_proc => wm_proc,
+    }
 
     @shifted = nil  #TODO.
 
@@ -41,19 +49,15 @@ class FSArray < Array
   end
 
   #
-  # Over/underflow callback methods getter/setter, etc.
+  # Over/Underflow callback methods getter/setter, etc.
   #
-  def of_proc; @opt[:of_proc]; end
-  def of_proc=( newp ); @opt[:of_proc] = newp; end
-  def of_enable; @opt[:of_enbl] = true; end
-  def of_disable; @opt[:of_enbl] = false; end
-  def of_enable?; @opt[:of_enbl] ; end
-
-  def uf_proc; @opt[:uf_proc]; end
-  def uf_proc=( newp ); @opt[:uf_proc] = newp; end
-  def uf_enable; @opt[:uf_enbl] = true; end
-  def uf_disable; @opt[:uf_enbl] = false; end
-  def uf_enable?; @opt[:uf_enbl] ; end
+  ["o", "u"].each{|which|
+    eval("def #{which}f_proc; @opt[:#{which}f_proc]; end")
+    eval("def #{which}f_proc=(newp); @opt[:#{which}f_proc] = newp; end")
+    eval("def #{which}f_enable?; @opt[:#{which}f_enable]; end")
+    eval("def #{which}f_enable; @opt[:#{which}f_enable]  = true; end")
+    eval("def #{which}f_disable; @opt[:#{which}f_enable] = false; end")
+  }
 
   #
   # FIFO and data size-related methods.
@@ -77,14 +81,11 @@ class FSArray < Array
   # shift and push - main methods of FSFIFO.
   #
   def shift
-    ret = shift_org
 
     # callback method when under flow is enabled.
-    if self.size == 0
-      if @opt[:uf_enbl]
-        @opt[:uf_proc].call
-      end
-    end
+    @opt[:uf_proc].call if self.size == 0 and @opt[:uf_enable]
+
+    ret = shift_org
 
     return ret
   end
@@ -93,7 +94,7 @@ class FSArray < Array
 
     #
     push_org( obj )
-   
+
     #
     of_called = false
     wm_called = false
@@ -102,13 +103,13 @@ class FSArray < Array
       shift_org
 
       # overflow callback.
-      if @opt[:of_enbl] and not(of_called)
+      if @opt[:of_enable] and not(of_called)
         @opt[:of_proc].call
         of_called = true
       end
 
       # TODO.watermark callback.
-      if @opt[:wm_enbl] and not(wm_called)
+      if @opt[:wm_enable] and not(wm_called)
         @opt[:wm_proc].call
         wm_called = true
       else

@@ -4,9 +4,6 @@
 #
 
 # Unit Test Lib.
-#require "rubygems"
-#gem "test-unit"
-#require "test/unit"
 require 'helper'
 require 'test/unit'
 
@@ -26,8 +23,8 @@ class TestFSArray < Test::Unit::TestCase
     @of_proc_called = false
     @uf_proc_called = false
 
-    @fifo.of_proc = Proc.new { p "of called."; @of_proc_called ^= true }
-    @fifo.uf_proc = Proc.new { p "uf called."; @uf_proc_called ^= true }
+    @fifo.of_proc = Proc.new { p "of called."; @of_proc_called = true }
+    @fifo.uf_proc = Proc.new { p "uf called."; @uf_proc_called = true }
   end
 
   def teardown
@@ -41,6 +38,10 @@ class TestFSArray < Test::Unit::TestCase
     ff = FSFIFO.new( size: 10 )
     assert_equal(  0, ff.size )
     assert_equal( 10, ff.fifosize )
+
+    ff = FSFIFO.new( 2 )
+    assert_equal( 0, ff.size )
+    assert_equal( 2, ff.fifosize )
 
   end
 
@@ -159,8 +160,25 @@ class TestFSArray < Test::Unit::TestCase
   end
 
   ####
-  
+
+  def test_default_uo
+
+    ff = FSFIFO.new( size: 3, of_enable: true, uf_enable: true )
+    assert_equal(  0, ff.size )
+    assert_equal( 3, ff.fifosize )
+
+    ff.push( 1 ); ff.push( 2 ); ff.push( 3 )
+    e = assert_raise( RuntimeError ){ ff.push( 4 ); }
+
+    3.times { ff.shift; }
+    e = assert_raise( RuntimeError ){ ff.shift; }
+
+  end
+
   def test_of
+
+    assert_equal( 0, @fifo.size )
+    assert_equal( 1, @fifo.fifosize )
 
     @fifo.of_enable
     assert_equal( true, @fifo.of_enable? )
@@ -169,10 +187,12 @@ class TestFSArray < Test::Unit::TestCase
     @fifo.push( 2 )
     assert_equal( true, @of_proc_called )
 
+    @of_proc_called = false
     @fifo.push( 3 )
-    assert_equal( false, @of_proc_called )
+    assert_equal( true, @of_proc_called )
 
     @fifo.of_disable
+    @of_proc_called = false
     @fifo.push( 4 )
     assert_equal( false, @of_proc_called )
 
@@ -180,17 +200,23 @@ class TestFSArray < Test::Unit::TestCase
 
   def test_uf
 
+    assert_equal( 0, @fifo.size )
+    assert_equal( 1, @fifo.fifosize )
+
     @fifo.uf_enable
     assert_equal( true, @fifo.uf_enable? )
 
+    @uf_proc_called = false
     @fifo.push( 1 )
-    @fifo.shift
-    assert_equal( true, @uf_proc_called )
-
-    @fifo.push( 2 )
     @fifo.shift
     assert_equal( false, @uf_proc_called )
 
+    @uf_proc_called = false
+    @fifo.push( 1 )
+    2.times{ @fifo.shift }
+    assert_equal( true, @uf_proc_called )
+
+    @uf_proc_called = false
     @fifo.push( 3 )
     @fifo.uf_disable
     @fifo.shift
