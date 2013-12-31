@@ -11,10 +11,24 @@
 class FSArray < Array
 
   FSARRAY_SIZE_DEFAULT = 1
-  #
-  # FSArray#new( n )
-  # FSArray#new( size: n, of_enable: true, of_proc: Proc.new{...} )
-  #
+
+  # Fixed-size Array.
+  # ==== Args
+  # _size :: size of FSArray.
+  # size: :: same above.
+  # of_enable: :: Overflow proc enable: true (enable)/false (disable)
+  # of_proc: :: Overflow proc itself.
+  # uf_enable: :: Underflow proc enable: true (enable)/false (disable)
+  # uf_proc: :: Underflow proc itself.
+  # wm_size: Water mark ( <= fsarray size )
+  # wm_proc: Water mark proc.
+  # ==== Usage
+  # * FSArray#new( n )
+  # * FSArray#new( size: n, of_enable: true, of_proc: Proc.new{...} )
+  # * FSArray.new[ -1 ] :: newly pushed data.
+  # * FSArray.new[ 0 ] :: first-out data.
+  # ==== Return
+  # Object of FSArray.
   def initialize( _size = FSARRAY_SIZE_DEFAULT,
                   size: FSARRAY_SIZE_DEFAULT,
                   of_enable: false, of_proc: Proc.new{ raise "Overflow!" },

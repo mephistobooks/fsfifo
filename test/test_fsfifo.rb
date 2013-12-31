@@ -32,7 +32,7 @@ class TestFSArray < Test::Unit::TestCase
   end
 
   ####
-  
+
   def test_new
 
     ff = FSFIFO.new( size: 10 )
@@ -77,6 +77,7 @@ class TestFSArray < Test::Unit::TestCase
     assert_equal( 1, @fifo.size )
     assert_equal( 1, @fifo.fifosize )
     assert_equal( 'a', @fifo[0] )
+    assert_equal( 'a', @fifo[-1] )
 
     ret = @fifo.shift
     assert_equal( 0, @fifo.size )
@@ -88,6 +89,7 @@ class TestFSArray < Test::Unit::TestCase
     assert_equal( 1, @fifo.size )
     assert_equal( 1, @fifo.fifosize )
     assert_equal( 'c', @fifo[0] )
+    assert_equal( 'c', @fifo[-1] )
 
   end
 
@@ -103,31 +105,39 @@ class TestFSArray < Test::Unit::TestCase
     assert_equal( 1, @fifo.size )
     assert_equal( 4, @fifo.fifosize )
     assert_equal( 'm', ret.join )
+    assert_equal( 'm', @fifo[-1] )
 
     @fifo.push( 'o' )
     assert_equal( 2, @fifo.size )
     assert_equal( 4, @fifo.fifosize )
     assert_equal( 'mo', @fifo.join )
+    assert_equal( 'o', @fifo[-1] )
 
     @fifo.push( 'e' )
     assert_equal( 3, @fifo.size )
     assert_equal( 4, @fifo.fifosize )
     assert_equal( 'moe', @fifo.join )
+    assert_equal( 'm', @fifo[0] )
+    assert_equal( 'e', @fifo[-1] )
 
     @fifo.push( 'm' )
     assert_equal( 4, @fifo.size )
     assert_equal( 4, @fifo.fifosize )
     assert_equal( 'moem', @fifo.join )
+    assert_equal( 'm', @fifo[0] )
+    assert_equal( 'm', @fifo[-1] )
 
     @fifo.push( 'o' )
     assert_equal( 4, @fifo.size )
     assert_equal( 4, @fifo.fifosize )
     assert_equal( 'oemo', @fifo.join )
+    assert_equal( 'o', @fifo[-1] )
 
     @fifo.push( 'e' )
     assert_equal( 4, @fifo.size )
     assert_equal( 4, @fifo.fifosize )
     assert_equal( 'emoe', @fifo.join )
+    assert_equal( 'e', @fifo[-1] )
 
   end
 
