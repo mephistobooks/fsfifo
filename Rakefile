@@ -25,7 +25,9 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
+# $stderr.puts "LOAD_PATH in Rakefile (size: #{$LOAD_PATH.size}): #{$LOAD_PATH}"
 require 'rake/testtask'
+require 'test-unit'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
   #test.pattern = 'test/**/test_*.rb'
